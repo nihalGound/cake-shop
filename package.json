@@ -1,12 +1,17 @@
 {
-  "name": "cake-shop(ecommerce-website)",
+  "name": "cake-shop",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon ./src/index.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Nihal Gound, Shivam Gupta",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.5"
+  }
 }
