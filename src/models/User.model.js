@@ -87,7 +87,7 @@ userModel.methods.generateAccessToken = function(){
         {
             username:this.username,
             email:this.email,
-            id:this._id,
+            _id:this._id,
             firstName:this.firstName
         },
         process.env.ACCESS_TOKEN_SECRET,
@@ -101,7 +101,7 @@ userModel.methods.generateRefreshToken = function(){
         {
             username:this.username,
             email:this.email,
-            id:this._id,
+            _id:this._id,
             firstName:this.firstName
         },
         process.env.REFRESH_TOKEN_SECRET,

@@ -87,7 +87,7 @@ shopModel.methods.isPasswordCorrect = async function(password){
 shopModel.methods.generateAcessToken = function(){
     const token = jwt.sign(
         {
-            id:this._id,
+            _id:this._id,
             email:this.email,
             shopname:this.shopname,
             gstin:this.gstin,
@@ -100,7 +100,7 @@ shopModel.methods.generateAcessToken = function(){
 shopModel.methods.generateRefreshToken = function(){
     const token = jwt.sign(
         {
-            id:this._id,
+            _id:this._id,
             email:this.email,
             shopname:this.shopname,
             gstin:this.gstin,
