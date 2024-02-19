@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { jwt } from "jsonwebtoken";
+import jwt  from "jsonwebtoken";
 
 const shopModel = new mongoose.Schema({
     firstName:{
@@ -64,7 +64,7 @@ const shopModel = new mongoose.Schema({
         required:[true,"phone no. is required"],
         validate:{
             validator:function(number){
-                return /^(\+91\)?[6,7,8,9]\d{9}$/.test(number);
+                return /^(\+91)?[6-9]\d{9}$/.test(number);
             },
             message:"valid phone number required",
         },

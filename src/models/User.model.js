@@ -7,14 +7,14 @@ const userModel = new mongoose.Schema(
     firstName: {
       type: String,
       required: [true, "User's first name required"],
-      minLength: [5, "Name should be atleast 5 Characters"],
+      minLength: [3, "Name should be atleast 5 Characters"],
       maxLength: [50, "Name should be atmost 5 Characters"],
       lowercase: true,
       trim: true,
     },
     middleName: {
       type: String,
-      minLength: [5, "Name should be atleast 5 Characters"],
+      minLength: [3, "Name should be atleast 5 Characters"],
       maxLength: [50, "Name should be atmost 5 Characters"],
       lowercase: true,
       trim: true,
@@ -22,7 +22,7 @@ const userModel = new mongoose.Schema(
     lastName: {
       type: String,
       required: [true, "User's last  name required"],
-      minLength: [5, "Name should be atleast 5 Characters"],
+      minLength: [3, "Name should be atleast 5 Characters"],
       maxLength: [50, "Name should be atmost 5 Characters"],
       lowercase: true,
       trim: true,
@@ -33,10 +33,12 @@ const userModel = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: [
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        "Please fill a valid email address",
-      ],
+      validate:{
+        validator:function(eml){
+          return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(eml)
+        },
+        message:"enter a valid email address"
+      },
     },
 
     avatar: {
@@ -86,7 +88,7 @@ const userModel = new mongoose.Schema(
       required: [true, "phone number is required"],
       validate: {
         validator: function (v) {
-          return /^(\+91\)?[6,7,8,9]\d{9}$/.test(v);
+          return /^(\+91)?[6-9]\d{9}$/.test(v);
         },
         message: (props) => `${props.value} is not valid number`,
       },
@@ -135,6 +137,4 @@ userModel.methods.generateRefreshToken = function () {
 
 export const User = mongoose.model("User", userModel);
 
-
-export default User;
 
