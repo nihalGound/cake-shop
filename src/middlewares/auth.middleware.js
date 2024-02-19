@@ -1,10 +1,8 @@
-import { jwt } from "jsonwebtoken";
+import jwt  from "jsonwebtoken";
 import {apiError} from "../utils/apiError.js";
 import {User} from "../models/User.model.js";
 import {Shop} from "../models/Shop.model.js";
 
-import AppError from "../utils/error.utils.js";
-import jwt from "jsonwebtoken";
 
 
 const auth = async (req,_,next)=>{
@@ -13,7 +11,7 @@ const auth = async (req,_,next)=>{
         if(!token){
             throw new apiError(401,"unauthorized user");
         }
-        const decodedToken = await jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+        const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
         const user = await User.findById(decodedToken._id).select("-password -refreshToken");
         const shop = await Shop.findById(decodedToken._id).select("-password -refreshToken");
         if(!user){
@@ -33,29 +31,6 @@ const auth = async (req,_,next)=>{
 }
 
 
-
-
-const isLoggedIn = async (req,res,next) =>{
-    try{
-        const {token} = req.cookies;
-
-        if(!token){
-            return new(AppError('token not find',400))
-        }
-    
-        const userDetails = await jwt.verify(token,process.env.JWT_SECRET);
-        req.user = userDetails;
-        next();
-
-    }catch(e){
-        return next(new AppError('TOKEN NOT GENERATED',500))
-        
-    }
-   
-
-}
-
 export{
-    isLoggedIn,
     auth
 }
