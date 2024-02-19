@@ -3,6 +3,9 @@ import {apiError} from "../utils/apiError.js";
 import {User} from "../models/User.model.js";
 import {Shop} from "../models/Shop.model.js";
 
+import AppError from "../utils/error.utils.js";
+import jwt from "jsonwebtoken";
+
 
 const auth = async (req,_,next)=>{
     try {
@@ -29,4 +32,30 @@ const auth = async (req,_,next)=>{
     }
 }
 
-export {auth};
+
+
+
+const isLoggedIn = async (req,res,next) =>{
+    try{
+        const {token} = req.cookies;
+
+        if(!token){
+            return new(AppError('token not find',400))
+        }
+    
+        const userDetails = await jwt.verify(token,process.env.JWT_SECRET);
+        req.user = userDetails;
+        next();
+
+    }catch(e){
+        return next(new AppError('TOKEN NOT GENERATED',500))
+        
+    }
+   
+
+}
+
+export{
+    isLoggedIn,
+    auth
+}
