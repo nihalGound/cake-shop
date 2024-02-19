@@ -11,7 +11,9 @@ dotenv.config({
 dbConnect();
 
 app.listen(process.env.PORT,async ()=>{
-    await dbConnect();
     console.log(`server started at port ${process.env.PORT}`);
 });
+
+
+//http://localhost:8000/api/v1
 
