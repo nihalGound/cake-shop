@@ -43,10 +43,10 @@ const userModel = new mongoose.Schema(
 
     avatar: {
       public_id: {
-        type: "string",
+        type:String,
       },
       secure_url: {
-        type: "string",
+        type: String,
       },
     },
     username: {
@@ -59,7 +59,7 @@ const userModel = new mongoose.Schema(
       required: [true, "password is required"],
     },
     dob: {
-      type: Date,
+      type: String,
       required: [true, "date of birth is required"],
     },
     homeAdress: {
@@ -93,6 +93,18 @@ const userModel = new mongoose.Schema(
         message: (props) => `${props.value} is not valid number`,
       },
     },
+    OTP: {
+      otp:{
+        type:Number,
+      },
+      messageId:{
+        type:String,
+      }
+    },
+    isEmailVerified:{
+      type:Boolean,
+      default:false,
+    }
   },
   { timestamps: true }
 );
@@ -107,6 +119,12 @@ userModel.pre("save", async function (next) {
 userModel.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
+
+userModel.methods.verifyOtp = async function (otp,messageId) {
+    if(this.OTP.otp == otp && this.OTP.messageId==messageId)
+      return true;
+    return false;
+}
 
 userModel.methods.generateAccessToken = function () {
   const token = jwt.sign(
