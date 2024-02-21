@@ -22,4 +22,4 @@ router.post('/update-name',auth,updateName);
 router.post('/refresh-AccessToken',refreshAccessToken);
 router.post('/get-profile',auth,getUserProfile);
 
-export {router}
+export const userRouter = router;
