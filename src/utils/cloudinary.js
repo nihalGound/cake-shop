@@ -33,7 +33,7 @@ const deleteFromCloudinary = async (publicId) => {
         }
     } catch (error) {
         console.error(error);
-        return { success: false, message: error.message || "Failed to delete file from Cloudinary" };
+        return null;
     }
 };
 
