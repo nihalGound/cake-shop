@@ -253,7 +253,7 @@ const updateAvatar = asyncHandler(async (req,res)=>{
     const oldAvatar = await User.findById(req.user._id).select("avatar");
 
     const deleteOldAvatar = await deleteFromCloudinary(oldAvatar.public_id);
-    //don't know what if old avatar couldn't delete from cloudinary
+    console.log(deleteOldAvatar)
 
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
@@ -303,27 +303,37 @@ const getUserProfile = asyncHandler(async (req,res)=>{
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
-    const { refreshToken } = req.cookies || {}; 
+    const { refreshToken } = req.cookies; 
 
-
-    if (!refreshToken)
-        throw new apiError(401, "unauthorized request", "refreshToken not provided");
+    if (!refreshToken) {
+        throw new apiError(401, "Unauthorized request", "Refresh token not provided");
+    }
 
     try {
-        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const decodedToken =jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        
+        if (!decodedToken) {
+            throw new apiError(402, "Invalid refresh token", "Invalid refresh token");
+        }
+
         const user = await User.findById(decodedToken._id);
-        if (!user)
-            throw new apiError(402, "invalid refresh token", "invalid refresh token provided");
+
+        if (!user) {
+            throw new apiError(402, "Invalid refresh token", "Invalid refresh token provided");
+        }
+
         const { newAccessToken, newRefreshToken } = await generateAccessRefreshToken(user._id);
 
-        const option = {
-            HttpOnly: true,
+        const options = {
+            httpOnly: true,
             secure: true
         };
+
         const updatedUser = await User.findById(user._id).select("-password -refreshToken");
+        
         res.status(200)
-            .cookie("accessToken", newAccessToken, option)
-            .cookie("refreshToken", newRefreshToken, option)
+            .cookie("accessToken", newAccessToken, options)
+            .cookie("refreshToken", newRefreshToken, options)
             .json(
                 new apiResponse(
                     200,
@@ -332,43 +342,46 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
                         accessToken: newAccessToken,
                         refreshToken: newRefreshToken
                     },
-                    "token refreshed successfully"
+                    "Token refreshed successfully"
                 )
             );
     } catch (error) {
-        throw new apiError(400,"invalid refresh token");
+        throw new apiError(500, "Internal Server Error", error.message);
     }
 });
 
 
-const sendVerificationEmail = asyncHandler(async (req,res)=>{
-    const {email}=req.body;
+const sendVerificationEmail = asyncHandler(async (req, res) => {
+    const {email}= req.body;
 
     if(!email)
-        throw new apiError(401,"email is required","email not found");
+        throw new apiError(401,"email is required","invalid email");
+    const userExist = await User.findOne({email});
+    if(!userExist)
+        throw new apiError(402,"user is not registeredd","user not exxist");
 
-    const user = await User.findOne({email});
-    if(!user)
-        throw new apiError(401,"user is not registered","unregistered user");
-    const otp = generateOtp();
-    const message = "this is mail for verification of email"
-    const subject = "OTP for verification of email"
-    const isEmailSend = await emailSend(email,message,otp,subject);
-    if(isEmailSend===null)
-        throw new apiError(500,"cannot send email","cannot send email");
-    
+    const message = "this is email for verification of email id ";
+    const subject = "verification of email";
+    const otp =  generateOtp();
+    if(otp===null)
+        throw new apiError(500,"cannot generate otp","cannot generate otp");
+
+    const emailResponse = await emailSend(email,message,otp,subject);
+
+    if(emailResponse===null)
+        throw new apiError(500,"cannot send email","cannot send email")
+
     res.status(200)
-    .json(new apiResponse(
-        200,
-        {
-            data:{
-                otp:otp,
-                messageId:isEmailSend.messageId
-            }
-        },
-        "email send successfully"
-    )) 
-})
+    .json(
+        new apiResponse(
+            200,
+            {
+                data:otp,emailResponse
+            },
+            "email send successfully"
+        )
+    )
+});
 
 const emailVerify = asyncHandler(async (req,res)=>{
     const {otp,messageId,email}=req.body;
