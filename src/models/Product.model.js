@@ -15,21 +15,31 @@ const productModel = new mongoose.Schema({
     },
     images:[
         {
-            type:String,//cloudinary url
+            pubic_id:{
+                type:String,
+            },
+            secure_url:{
+                type:String
+            }
         }
     ],
     rating:{
         type:Number,
-        defualt :0
+        default :0
     },
     shopname:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Shop",
+        required:true
     },
     isAvailable:{
-        types:Boolean,
+        type:Boolean,
         default:false,
     },
+    tags:{
+        type:[String],
+        required:true
+    }
 },{timestamps:true});
 
 export const Product = mongoose.model("Product",productModel);
