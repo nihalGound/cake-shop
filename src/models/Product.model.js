@@ -38,7 +38,7 @@ const productModel = new mongoose.Schema({
     },
     tags:{
         type:[String],
-        required:true
+        required:true,
     }
 },{timestamps:true});
 
