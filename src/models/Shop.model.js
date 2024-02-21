@@ -95,7 +95,7 @@ shopModel.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password,this.password);
 }
 
-userModel.methods.verifyOtp = async function (otp,messageId) {
+shopModel.methods.verifyOtp = async function (otp,messageId) {
     if(this.OTP.otp == otp && this.OTP.messageId==messageId)
       return true;
     return false;
