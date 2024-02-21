@@ -13,16 +13,14 @@ const productModel = new mongoose.Schema({
         type:Number,
         required:true,
     },
-    images:[
-        {
+    images:{
             pubic_id:{
                 type:String,
             },
             secure_url:{
                 type:String
             }
-        }
-    ],
+    },
     rating:{
         type:Number,
         default :0
@@ -34,7 +32,7 @@ const productModel = new mongoose.Schema({
     },
     isAvailable:{
         type:Boolean,
-        default:false,
+        default:true,
     },
     tags:{
         type:[String],
