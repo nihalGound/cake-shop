@@ -9,14 +9,14 @@ const auth = async (req,_,next)=>{
     try {
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","");
         if(!token){
-            throw new apiError(401,"unauthorized user");
+            throw new apiError(401,"unauthorized user","accessToken not provided");
         }
         const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
         const user = await User.findById(decodedToken._id).select("-password -refreshToken");
         const shop = await Shop.findById(decodedToken._id).select("-password -refreshToken");
         if(!user){
             if(!shop){
-                throw new apiError(404,"Invalid access Token");
+                throw new apiError(404,"Invalid access Token","invalid access token for shop");
             }
             else{
                 req.shop = shop;
@@ -30,7 +30,26 @@ const auth = async (req,_,next)=>{
     }
 }
 
+const shopAuth = async (req,_,next)=>{
+    try {
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ","");
+        if(!token){
+            throw new apiError(401,"unauthorized user","accessToken not provided");
+        }
+        const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
+        const shop = await Shop.findById(decodedToken._id).select("-password -refreshToken");
+            if(!shop){
+                throw new apiError(404,"Invalid access Token","invalid access token for shop");
+            }
+        req.shop = shop;
+        next();
+    } catch (error) {
+        return next(new apiError(401,error?.message || "Invalid access token"));
+    }
+}
+
 
 export{
-    auth
+    auth,
+    shopAuth
 }
