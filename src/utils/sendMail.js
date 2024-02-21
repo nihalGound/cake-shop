@@ -1,39 +1,63 @@
-import { asyncHandler } from "./asyncHandler.js";
 import { nodeMailer } from "./nodeMailer.js";
 import { User } from "../models/User.model.js";
 import { apiError } from "./apiError.js";
-import { updateAvatar } from "../controllers/user.controller.js";
+import { Shop } from "../models/Shop.model.js";
 
-const emailSend = asyncHandler(async (email,message,otp,subject)=>{
+const emailSend = async (email, message, otp, subject) => {
     try {
-
-        const isemailSend = await nodeMailer(email,otp,message,subject);
-
-        if(!isemailSend)
-            throw new apiError(500,"cannot send otp in mail","cannot mail otp");
-        const updtedUser = await User.findOneAndUpdate(
+        const mailResponse = await nodeMailer(email,otp,message,subject);
+        if(mailResponse===null)
+            throw new apiError(500,"cannot send mail","error in sending mail");
+        const updatedUser = await User.findOneAndUpdate(
             {email:email},
             {
                 $set:{
                     OTP:{
                         otp:otp,
-                        messageId:isemailSend.messageId
+                        messageId:mailResponse.messageId
                     }
                 }
             },
-            {
-                new:true
-            }
+            {new:true}
         );
-        if(!updtedUser)
-            throw new apiError(404,"User not found", "Failed to update OTP");
-        return {otp,isemailSend};
+    
+        if(!updatedUser)
+            throw new apiError(500,"cannot update otp in database","error while updating opt in db");
+    
+        return mailResponse;
     } catch (error) {
-        console.error(error)
-        return false;
+        return null;
     }
-});
+}
+
+const shopEmailSend = async (email,message,otp,subject)=>{
+    try {
+        const mailResponse = await nodeMailer(email,otp,message,subject);
+        if(mailResponse===null)
+            throw new apiError(500,"cannot send mail","error in sending mail");
+        const updatedUser = await Shop.findOneAndUpdate(
+            {email:email},
+            {
+                $set:{
+                    OTP:{
+                        otp:otp,
+                        messageId:mailResponse.messageId
+                    }
+                }
+            },
+            {new:true}
+        );
+    
+        if(!updatedUser)
+            throw new apiError(500,"cannot update otp in database","error while updating opt in db");
+    
+        return mailResponse;
+    } catch (error) {
+        return null;
+    }
+}
 
 export {
-    emailSend
+    emailSend,
+    shopEmailSend
 }
