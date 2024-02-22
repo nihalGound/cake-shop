@@ -9,7 +9,7 @@ router.post('/add-product',upload.single('product'),shopAuth,addProduct);
 
 router.route('/add-product/:id')
     .put(auth,shopAuth,updateProduct)
-    // .delete(auth, shopAuth,removeProduct)
+    .delete(auth, shopAuth,removeProduct)
 
 
 export const productRouter = router; 
