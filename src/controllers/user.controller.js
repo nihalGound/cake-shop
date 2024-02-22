@@ -6,6 +6,7 @@ import {asyncHandler} from "../utils/asyncHandler.js";
 import {deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import {emailSend} from "../utils/sendMail.js";
+import { Product } from "../models/Product.model.js";
 
 
 const generateAccessRefreshToken = async(userId)=>{
@@ -460,6 +461,30 @@ const resetPassword = asyncHandler(async (req,res)=>{
 
 });
 
+const addToCart = asyncHandler(async (req,res)=>{
+    const {productId} = req.params;
+    if(!productId?.trim())
+        throw new apiError(401,"product id not provided","product id not provided");
+    const product = await Product.findById(productId);
+    if(!product)
+        throw new apiError(402,"product not found","product not fouund");
+    const user = await User.findById(req.user._id);
+    user.cart.push(productId);
+    await user.save();
+    const updatedUser = await User.findById(user._id).select("-password -refreshToken");
+    if(!updatedUser)
+        throw new apiError(500,"cannot add prodcut into cart","cannot add product into cart");
+
+    res.status(200)
+    .json(
+        new apiResponse(
+            200,
+            updatedUser,
+            "prodcut added into cart"
+        )
+    )
+});
+
 export {
     registerUser,
     loginUser,
@@ -473,5 +498,6 @@ export {
     forgotPassword,
     resetPassword,
     emailVerify,
-    sendVerificationEmail
+    sendVerificationEmail,
+    addToCart
 }
