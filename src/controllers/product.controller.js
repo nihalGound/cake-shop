@@ -59,9 +59,14 @@ const addProduct = asyncHandler(async (req,res)=>{
 });
 
 const updateProduct = asyncHandler(async (req, res, next) => {
+      const {_id} = req.shop._id;
       const { id } = req.params;
       if(!id?.trim())
       throw new apiError(401,"product id is not provided","product id is not provided")
+
+        const isAdmin = await Product.findById(id).select("shop");
+        if(isAdmin!==_id)
+            throw new apiError(405,"admin not matched","admin not matched");
   
       const product = await Product.findByIdAndUpdate(
         id,
@@ -85,9 +90,14 @@ const updateProduct = asyncHandler(async (req, res, next) => {
 });
 
 const removeProduct = asyncHandler(async (req, res, next) => {
-      const { id } = req.params;
-      if(!id?.trim())
-      throw new apiError(401,"product id is not provided","product id is not provided")
+        const {_id} = req.shop._id;
+        const { id } = req.params;
+        if(!id?.trim())
+            throw new apiError(401,"product id is not provided","product id is not provided")
+
+      const isAdmin = await Product.findById(id).select("shop");
+      if(isAdmin!==_id)
+          throw new apiError(405,"admin not matched","admin not matched");
 
       const product = await Product.findById(id);
       if (!product) {
@@ -235,6 +245,59 @@ const getProductBySubcategory = asyncHandler(async (req,res)=>{
     )
 });
 
+const getProductByPriceRange = asyncHandler(async (req,res)=>{
+    const {priceRange} = req.params;//req.params comes in string
+    if(!priceRange?.trim())
+        throw new apiError(401,"price range not sent","price range not sent");
+    const [minPrice,maxPrice] = priceRange.split('-');
+    const realMinPrice = parseFloat(minPrice);//convert string to number
+    const realMaxPrice = parseFloat(maxPrice);//convert string to number
+    const product = await Product.aggregate([
+        {
+            $match:{
+                "price":{$gte:realMinPrice, $lte:realMaxPrice}
+            }
+        },
+        {
+            $lookup:{
+                "from":"shops",
+                "localField":"shop",
+                "foreignField":"_id",
+                "as":"shop_owner"
+            }
+       },
+       {
+            $project:{
+                "name":1,
+                "description":1,
+                "price":1,
+                "shop_owner.shopname":1,
+                "shop_owner.gstin": 1,
+                "images":1,
+                "tags":1,
+                "category":1,
+                "subcategory":1,
+                "isAvailable":1,
+                "rating":1
+            }
+       }
+
+    ]);
+
+    if(!product.length)
+        throw new apiError(500,"cannot fetched any product","cannot fetche any prodcut");
+
+    res.status(200)
+    .json(
+        new apiResponse(
+            200,
+            product,
+            "product fetched successfully"
+        )
+    )
+
+});
+
 export {
     addProduct,
     getAllProduct,
@@ -242,4 +305,5 @@ export {
     getProductBySubcategory,
     updateProduct,
     removeProduct,
+    getProductByPriceRange
 }
