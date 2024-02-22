@@ -57,6 +57,57 @@ const addProduct = asyncHandler(async (req,res)=>{
     )
 
 });
+const updateProduct = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+  
+      const product = await Product.findByIdAndUpdate(
+        id,
+        {
+          $set: req.body,
+        },
+        {
+          new : true,
+          runValidators: true,
+        }
+      );
+  
+      if (!product) {
+        return next(new apiError("product with given id does not exist", 500));
+      }
+      res.status(200).json({
+        success: true,
+        message: "product updated successfully!!",
+        product,
+      });
+    } catch (e) {
+      return next(new apiError(e.message, 500));
+    }
+  };
+
+  
+const removeProduct = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const product = await Product.findById(id);
+      if (!product) {
+        return next(new apiError("product with given id does not exist", 500));
+      }
+  
+      await Product.findByIdAndDelete(id);
+      res.status(200).json({
+        success: true,
+        message: "Product Deleted successfully!!",
+        product,
+        
+      });
+    } catch (e) {
+      return next(new apiError(e.message, 500));
+    }
+  };
+  
+
+
 
 const getAllProduct = asyncHandler(async (res)=>{
     const product = await Product.aggregate([
@@ -193,5 +244,7 @@ export {
     addProduct,
     getAllProduct,
     getProductByCategory,
-    getProductBySubcategory
+    getProductBySubcategory,
+    updateProduct,
+    removeProduct,
 }
