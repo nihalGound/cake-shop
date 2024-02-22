@@ -10,9 +10,10 @@ router.get('/allProduct',getAllProduct);
 router.get('/productbycategory/:category',getProductByCategory);
 router.get('/productbycategory/:subcategory',getProductBySubcategory);
 
-router.route('/add-product/:id')
-    .put(auth,shopAuth,updateProduct)
-    .delete(auth, shopAuth,removeProduct)
+//secure routes
+router.delete('/delete-product',shopAuth,removeProduct);
+
+router.put('/update-product/:id',shopAuth,updateProduct);
 
 
 export const productRouter = router; 
