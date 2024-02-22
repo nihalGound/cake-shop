@@ -14,7 +14,7 @@ const productModel = new mongoose.Schema({
         required:true,
     },
     images:{
-            pubic_id:{
+            public_id:{
                 type:String,
             },
             secure_url:{
@@ -25,7 +25,7 @@ const productModel = new mongoose.Schema({
         type:Number,
         default :0
     },
-    shopname:{
+    shop:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Shop",
         required:true
@@ -37,6 +37,14 @@ const productModel = new mongoose.Schema({
     tags:{
         type:[String],
         required:true,
+    },
+    category: {
+        type:String,
+        enum:["birthday","party","marriage"]
+    },
+    subcategory: {
+        type:String,
+        enum:["chocolate","strawberry","orange","pineapple"]
     }
 },{timestamps:true});
 
