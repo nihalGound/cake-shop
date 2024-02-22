@@ -21,9 +21,4 @@ router.post('/update-name',auth,updateName);
 router.post('/refresh-AccessToken',refreshAccessToken);
 router.post('/get-profile',auth,getUserProfile);
 
-// cake remove and delete routes
-// router.route('/:id')
-//     .put(auth,shopAuth('ADMIN'),updateShop)
-//     .delete(auth, shopAuth('ADMIN'),removeShop)
-
 export const shopRouter = router;

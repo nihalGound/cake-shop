@@ -5,13 +5,16 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const addProduct = asyncHandler(async (req,res)=>{
-    const {name,description,price,tags} = req.body;
+    const {name,description,price,tags,category,subcategory} = req.body;
 
-    if([name,description,price].some((field)=>field.trim()===""))
+    if([name,description,price,category,subcategory].some((field)=>field.trim()===""))
         throw new apiError(401,"all field are not provided","all field are required to add prodcut");
 
     if(!tags || !Array.isArray(tags) || !tags.length>0)
         throw new apiError(401,"tag is not provided","tag is not provided");
+    const isVerified = req.shop.isEmailVerified;
+    if(!isVerified)
+        throw new apiError(403,"email is not verified","email is not verified");
     const shopname = req.shop._id;
 
     let imageLocalPath;
@@ -29,9 +32,14 @@ const addProduct = asyncHandler(async (req,res)=>{
         name,
         description,
         price,
-        images:image,
+        images:{
+            public_id:image.public_id,
+            secure_url:image.secure_url
+        },
         tags,
-        shopname:shopname
+        shopname:shopname,
+        category,
+        subcategory
     });
     const updatedProduct = await Product.findById(product._id);
     if(!updatedProduct)
@@ -49,9 +57,11 @@ const addProduct = asyncHandler(async (req,res)=>{
     )
 
 });
-const updateProduct = async (req, res, next) => {
-    try {
+
+const updateProduct = asyncHandler(async (req, res, next) => {
       const { id } = req.params;
+      if(!id?.trim())
+      throw new apiError(401,"product id is not provided","product id is not provided")
   
       const product = await Product.findByIdAndUpdate(
         id,
@@ -72,15 +82,13 @@ const updateProduct = async (req, res, next) => {
         message: "product updated successfully!!",
         product,
       });
-    } catch (e) {
-      return next(new apiError(e.message, 500));
-    }
-  };
+});
 
-  
-const removeProduct = async (req, res, next) => {
-    try {
+const removeProduct = asyncHandler(async (req, res, next) => {
       const { id } = req.params;
+      if(!id?.trim())
+      throw new apiError(401,"product id is not provided","product id is not provided")
+    
       const product = await Product.findById(id);
       if (!product) {
         return next(new apiError("product with given id does not exist", 500));
@@ -93,16 +101,144 @@ const removeProduct = async (req, res, next) => {
         product,
         
       });
-    } catch (e) {
-      return next(new apiError(e.message, 500));
-    }
-  };
-  
+});
 
+const getAllProduct = asyncHandler(async (res)=>{
+    const product = await Product.aggregate([
+       {
+            $lookup:{
+                "from":"shops",
+                "localField":"shop",
+                "foreignField":"_id",
+                "as":"shop_owner"
+            }
+       },
+       {
+            $project:{
+                "name":1,
+                "description":1,
+                "price":1,
+                "shop_owner.shopname":1,
+                "shop_owner.gstin": 1,
+                "images":1,
+                "tags":1,
+                "category":1,
+                "subcategory":1,
+                "isAvailable":1,
+                "rating":1
+            }
+       }
+    ]);
+    if(!product.length)
+        throw new apiError(500,"cannot fetched products","cannot fetched prodcuts");
+    res.status(200)
+    .json(new apiResponse(
+        200,
+        product,
+        "product fetched succesfully"
+    ))
+});
 
+const getProductByCategory = asyncHandler(async (req,res)=>{
+    const {category }= req.params;
+    if(!category?.trim())
+        throw new apiError(401,"category not provided","category not provided");
+    const product = await Product.aggregate([
+        {
+            $match:{
+                "category":category
+            }
+        },
+        {
+            $lookup:{
+                "from":"shops",
+                "localField":"shop",
+                "foreignField":"_id",
+                "as":"shop_owner"
+            }
+        },
+        {
+            $project:{
+                "name":1,
+                "description":1,
+                "price":1,
+                "shop_owner.shopname":1,
+                "shop_owner.gstin": 1,
+                "images":1,
+                "tags":1,
+                "category":1,
+                "subcategory":1,
+                "isAvailable":1,
+                "rating":1
+            }
+        }
+    ]);
+    if(!product.length)
+        throw new apiError(500,"couldnot fetched product by category","couldnot fetched product by category")
+
+    res.status(200)
+    .json(
+        new apiResponse(
+            200,
+            product,
+            "product fetched successfully"
+        )
+    )
+});
+
+const getProductBySubcategory = asyncHandler(async (req,res)=>{
+    const {subcategory} = req.params;
+    if(!subcategory?.trim())
+        throw new apiError(401,"subcategory not found","subcategory not found")
+
+    const product = await Product.aggregate([
+        {
+            $match:{
+                "subcategory":subcategory
+            }
+        },
+        {
+            $lookup:{
+                "from":"shops",
+                "localField":"shop",
+                "foreignField":"_id",
+                "as":"shop_owner"
+            }
+       },
+       {
+            $project:{
+                "name":1,
+                "description":1,
+                "price":1,
+                "shop_owner.shopname":1,
+                "shop_owner.gstin": 1,
+                "images":1,
+                "tags":1,
+                "category":1,
+                "subcategory":1,
+                "isAvailable":1,
+                "rating":1
+            }
+       }
+    ]);
+    if(!product.length)
+        throw new apiError(500,"product cannot fetched","product cannot fetched")
+
+    res.status(200)
+    .json(
+        new apiResponse(
+            200,
+            product,
+            "product fetched successfully"
+        )
+    )
+});
 
 export {
     addProduct,
+    getAllProduct,
+    getProductByCategory,
+    getProductBySubcategory,
     updateProduct,
     removeProduct,
 }
