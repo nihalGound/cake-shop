@@ -57,9 +57,11 @@ const addProduct = asyncHandler(async (req,res)=>{
     )
 
 });
-const updateProduct = async (req, res, next) => {
-    try {
+
+const updateProduct = asyncHandler(async (req, res, next) => {
       const { id } = req.params;
+      if(!id?.trim())
+      throw new apiError(401,"product id is not provided","product id is not provided")
   
       const product = await Product.findByIdAndUpdate(
         id,
@@ -80,15 +82,13 @@ const updateProduct = async (req, res, next) => {
         message: "product updated successfully!!",
         product,
       });
-    } catch (e) {
-      return next(new apiError(e.message, 500));
-    }
-  };
+});
 
-  
-const removeProduct = async (req, res, next) => {
-    try {
+const removeProduct = asyncHandler(async (req, res, next) => {
       const { id } = req.params;
+      if(!id?.trim())
+      throw new apiError(401,"product id is not provided","product id is not provided")
+    
       const product = await Product.findById(id);
       if (!product) {
         return next(new apiError("product with given id does not exist", 500));
@@ -101,13 +101,7 @@ const removeProduct = async (req, res, next) => {
         product,
         
       });
-    } catch (e) {
-      return next(new apiError(e.message, 500));
-    }
-  };
-  
-
-
+});
 
 const getAllProduct = asyncHandler(async (res)=>{
     const product = await Product.aggregate([
