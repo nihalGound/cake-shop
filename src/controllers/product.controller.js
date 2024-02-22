@@ -88,7 +88,7 @@ const removeProduct = asyncHandler(async (req, res, next) => {
       const { id } = req.params;
       if(!id?.trim())
       throw new apiError(401,"product id is not provided","product id is not provided")
-    
+
       const product = await Product.findById(id);
       if (!product) {
         return next(new apiError("product with given id does not exist", 500));
@@ -103,7 +103,7 @@ const removeProduct = asyncHandler(async (req, res, next) => {
       });
 });
 
-const getAllProduct = asyncHandler(async (res)=>{
+const getAllProduct = asyncHandler(async (_,res)=>{
     const product = await Product.aggregate([
        {
             $lookup:{
@@ -143,6 +143,7 @@ const getProductByCategory = asyncHandler(async (req,res)=>{
     const {category }= req.params;
     if(!category?.trim())
         throw new apiError(401,"category not provided","category not provided");
+
     const product = await Product.aggregate([
         {
             $match:{
