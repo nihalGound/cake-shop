@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {upload} from "../middlewares/multer.middleware.js";
 import {auth} from "../middlewares/auth.middleware.js";
-import { emailVerify, forgotPassword, getUserProfile, loginUser, logoutUser, refreshAccessToken, registerUser, resetPassword, sendVerificationEmail, updateAvatar, updateName, updatePassword, updateUsername } from "../controllers/user.controller.js";
+import { addToCart, emailVerify, forgotPassword, getUserProfile, loginUser, logoutUser, refreshAccessToken, registerUser, resetPassword, sendVerificationEmail, updateAvatar, updateName, updatePassword, updateUsername } from "../controllers/user.controller.js";
 
 const router = Router();
 
@@ -21,5 +21,6 @@ router.post('/update-password',auth,updatePassword);
 router.post('/update-name',auth,updateName);
 router.post('/refresh-AccessToken',refreshAccessToken);
 router.post('/get-profile',auth,getUserProfile);
+router.post('/add-to-cart/:productId',auth,addToCart);
 
 export const userRouter = router;
