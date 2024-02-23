@@ -10,13 +10,13 @@ const transport = nodemailer.createTransport({
     }
 });
 
-const nodeMailer = async (email,otp,message,subject)=>{
+const nodeMailer = async (email,message,subject)=>{
     try {
         const info = await transport.sendMail({
             from:"nsnihalgound123@gmail.com",
             to:email,
             subject:subject || "email verification",
-            text:`${message}, you otp is ${otp}`
+            text:`${message}`
         });
         return info;
     } catch (error) {
