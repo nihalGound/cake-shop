@@ -1,18 +1,15 @@
-import { User } from "../models/User.model.js";
-import jwt from "jsonwebtoken";
-import { apiError } from "../utils/apiError.js";
+import {Shop} from "../models/Shop.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import {apiError} from "../utils/apiError.js";
 import {apiResponse} from "../utils/apiResponse.js";
-import {asyncHandler} from "../utils/asyncHandler.js";
-import {deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js";
 import { generateOtp } from "../utils/generateOtp.js";
-import {emailSend} from "../utils/sendMail.js";
-import { Product } from "../models/Product.model.js";
-
+import { shopEmailSend } from "../utils/sendMail.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessRefreshToken = async(userId)=>{
     try {
-        const user = await User.findById(userId);
-        const accessToken = user.generateAccessToken();
+        const user = await Shop.findById(userId);
+        const accessToken = user.generateAcessToken();
         const refreshToken = user.generateRefreshToken();
         if(!accessToken || !refreshToken){
             throw new apiError(501,"something went wrong while generatinig access and refresh token","cannot generate token");
@@ -26,77 +23,71 @@ const generateAccessRefreshToken = async(userId)=>{
     }
 }
 
-const registerUser = asyncHandler(async (req,res)=>{
-    const {firstName,middleName,lastName,username,email,password,dob,phone} = req.body;
+const registerShop = asyncHandler(async (req,res)=>{
+    const {firstName,middleName,lastName,username,password,email,shopname,gstin,location,phone} = req.body;
 
-    if([firstName,lastName,username,email,password,dob,phone].some((field)=>field.trim()===""))
-        throw new apiError(401,"invalid data provided","data is not provided in registeration");
-    const userExist = await User.findOne({
-        $or:[{username},{email},{phone}]
+    if([firstName,middleName,lastName,username,password,email,shopname,gstin,phone].some((field)=>field.trim()===""))
+        throw new apiError(401,"all field are neccessary","insufficient data provided");
+    
+    if (!location || !location.type || !location.coordinates || location.type !== 'Point' || !Array.isArray(location.coordinates) || location.coordinates.length !== 2) {
+        throw new apiError(400,"invalid location data","invalid location data");
+    }  
+    
+    const userExist = await Shop.findOne({
+        $or:[{email},{phone},{username},{gstin}]
     });
-    if(userExist)   
-        throw new apiError(402,"user already exist","user already registerd");
 
-    let avatarLocalPath;
-    if(req.file && req.file.path)
-        avatarLocalPath = req.file.path;
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-    if(!avatar)
-        throw new apiError(500,"couldn't upload avatar on cloudinary","couldn't uplodad avatar on cloudinary");
+    if(userExist)
+        throw new apiError(401,"shop already exist","shop already registered");
 
-    const user = await User.create({
+    const user = await Shop.create({
         firstName,
         middleName,
         lastName,
         username,
-        email,
         password,
-        dob,
+        email,
+        shopname,
+        gstin,
         phone,
-        avatar:{
-            public_id:avatar.public_id,
-            secure_url:avatar.secure_url
-        },
+        location:{
+            type:'Point',
+            coordinates:location.coordinates
+        }
     });
 
-    const createdUser = await User.findById(user._id).select("-password -refreshToken");
+    const updatedUser = await Shop.findById(user._id).select("-passowrd -refreshToken");
 
-    if(!createdUser)
-        throw  new apiError(500,"couldn't create user","couldn't create user");
+    if(!updatedUser)
+        throw new apiError(500,"couldn't created shop user","couldn't created shop in database");
 
     res.status(200)
     .json(
         new apiResponse(
             200,
             {
-                user:createdUser
+                user:updatedUser
             },
-            "user registered successfully"
+            "shop registered successfully"
         )
     )
-
 });
 
-const loginUser = asyncHandler(async (req,res)=>{
-        const {username,password} = req.body;
-        if(!username || !password){
-            throw new apiError(401,"invalid credential","invalid username and password");
-        }
+const loginShop = asyncHandler(async (req,res)=>{
+    const {username,password} = req.body;
 
-    const user = await User.findOne({username});
+    if([username,password].some((field)=>field.trim()===""))
+        throw new apiError(400,"invalid data","all field are required");
+    const userExist = await Shop.findOne({username});
+    if(!userExist)  
+        throw new apiError(400,"user not registerd","shop user is not registered");
 
-    if(!user){
-        throw new apiError(404,"user is not registered");
-    }
+    const isValidPassword = await userExist.isPasswordCorrect(password);
+    if(!isValidPassword)
+        throw new apiError(401,"invalid password","invalid passowrd provided in shop");
 
-    const validUser = await user.isPasswordCorrect(password);
-    if(!validUser){
-        throw new apiError(401,"incorrect password");
-    }
-
-    const {accessToken,refreshToken} = await generateAccessRefreshToken(user._id);
-
-    const loogedUser = await User.findById(user._id).select("-password -refreshToken");
+    const {accessToken,refreshToken} = await generateAccessRefreshToken(userExist._id);
+    const loggedInUser = await Shop.findById(userExist._id).select("-password -refreshToken");
 
     const option = {
         HttpOnly:true,
@@ -110,16 +101,17 @@ const loginUser = asyncHandler(async (req,res)=>{
         new apiResponse(
             200,
             {
-                user:loogedUser,accessToken
+                user:loggedInUser
             },
-            "user logged in successfully"
+            "shop user logged in successfully"
         )
     )
+    
 });
 
-const logoutUser = asyncHandler(async (req,res)=>{
-    await User.findByIdAndUpdate(
-        req.user._id,
+const logoutShop = asyncHandler(async (req,res)=>{
+    await Shop.findByIdAndUpdate(
+        req.shop._id,
         {
             $set:{
                 refreshToken:undefined,
@@ -142,16 +134,15 @@ const logoutUser = asyncHandler(async (req,res)=>{
         new apiResponse(
             200,
             {},
-            "user logged out successfully"
+            "shop user logged out successfully"
         )
     )
-
 });
 
 const updateUsername = asyncHandler(async (req,res)=>{
     const {username} = req.body;
-    const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,
+    const updatedUser = await Shop.findByIdAndUpdate(
+        req.shop._id,
         {
             $set:{
                 username,
@@ -185,7 +176,7 @@ const updatePassword = asyncHandler(async (req,res)=>{
         throw new apiError(401,"new password should not match old password","new password same as old password")
     }
 
-    const user = await User.findById(req.user._id);
+    const user = await Shop.findById(req.shop._id);
 
     const validUser = await user.isPasswordCorrect(oldPassword);
     if(!validUser){
@@ -213,8 +204,8 @@ const updateName = asyncHandler(async (req,res)=>{
         throw new apiError(401,"invalid name","invalid firstname or lastname");
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,
+    const updatedUser = await Shop.findByIdAndUpdate(
+        req.shop._id,
         {
             $set:{
                 firstName:firstName,
@@ -240,53 +231,8 @@ const updateName = asyncHandler(async (req,res)=>{
     )
 });
 
-const updateAvatar = asyncHandler(async (req,res)=>{
-    let avatarLocalPath;
-    if(req.file && req.file.path)
-        avatarLocalPath = req.file.path;
-
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
-
-    if(!avatar){
-        throw new apiError(500,"cannot upload avatar on cloudinary","error in updating avatar");
-    }
-
-    const oldAvatar = await User.findById(req.user._id).select("avatar");
-
-    const deleteOldAvatar = await deleteFromCloudinary(oldAvatar.public_id);
-    console.log(deleteOldAvatar)
-
-    const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set:{
-                avatar:{
-                    public_id:avatar.public_id,
-                    secure_url:avatar.secure_url
-                }
-            }
-        },
-        {
-            new:true
-        }
-    );
-
-    if(!updatedUser)
-        throw new apiError(500,"cannot update avatar","cannot update avatar in db");
-
-    res.status(200)
-    .json(
-        new apiResponse(
-            200,
-            updatedUser,
-            "avatar updated successfully"
-        )
-    )
-
-});
-
 const getUserProfile = asyncHandler(async (req,res)=>{
-    const user = await User.findById(req.user._id).select("-passowrd -refreshToken");
+    const user = await Shop.findById(req.shop._id).select("-passowrd -refreshToken");
 
     if(!user)
         throw new apiError(402,"cannot find user","cannot find user to get profile");
@@ -298,7 +244,7 @@ const getUserProfile = asyncHandler(async (req,res)=>{
             {
                user:user 
             },
-            "user profile fetched successfully"
+            "Shop profile fetched successfully"
         )
     )
 });
@@ -317,7 +263,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new apiError(402, "Invalid refresh token", "Invalid refresh token");
         }
 
-        const user = await User.findById(decodedToken._id);
+        const user = await Shop.findById(decodedToken._id);
 
         if (!user) {
             throw new apiError(402, "Invalid refresh token", "Invalid refresh token provided");
@@ -330,7 +276,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true
         };
 
-        const updatedUser = await User.findById(user._id).select("-password -refreshToken");
+        const updatedUser = await Shop.findById(user._id).select("-password -refreshToken");
         
         res.status(200)
             .cookie("accessToken", newAccessToken, options)
@@ -352,12 +298,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 
-const sendVerificationEmail = asyncHandler(async (req, res) => {
+const sendVerificationEmail = asyncHandler(async (req,res)=>{
     const {email}= req.body;
 
     if(!email)
         throw new apiError(401,"email is required","invalid email");
-    const userExist = await User.findOne({email});
+    const userExist = await Shop.findOne({email});
     if(!userExist)
         throw new apiError(402,"user is not registeredd","user not exxist");
 
@@ -367,7 +313,7 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
     if(otp===null)
         throw new apiError(500,"cannot generate otp","cannot generate otp");
 
-    const emailResponse = await emailSend(email,message,otp,subject);
+    const emailResponse = await shopEmailSend(email,message,otp,subject);
 
     if(emailResponse===null)
         throw new apiError(500,"cannot send email","cannot send email")
@@ -387,7 +333,7 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
 const emailVerify = asyncHandler(async (req,res)=>{
     const {otp,messageId,email}=req.body;
 
-    const user = await User.findOne({email});
+    const user = await Shop.findOne({email});
 
     if(!user)
         throw new apiError(401,"invalid user","invalid user");
@@ -414,13 +360,13 @@ const forgotPassword = asyncHandler(async (req,res)=>{
     if(!email)
         throw new apiError(401,"email is required","email not found");
 
-    const user = await User.findOne({email});
+    const user = await Shop.findOne({email});
     if(!user)
-        throw new apiError(401,"user is not registered","unregistered user");
+        throw new apiError(401,"shop is not registered","unregistered user");
     const otp = generateOtp();
     const message = "this is mail for forgot password"
     const subject = "OTP for forgot password"
-    const isEmailSend = await emailSend(email,message,otp,subject);
+    const isEmailSend = await shopEmailSend(email,message,otp,subject);
     if(isEmailSend===null)
         throw new apiError(500,"cannot send email","cannot send email");
     
@@ -437,10 +383,10 @@ const forgotPassword = asyncHandler(async (req,res)=>{
 const resetPassword = asyncHandler(async (req,res)=>{
     const {otp,messageId,email,password}=req.body;
 
-    const user = await User.findOne({email});
+    const user = await Shop.findOne({email});
 
     if(!user)
-        throw new apiError(401,"invalid user","invalid user");
+        throw new apiError(401,"invalid shop user","invalid user");
 
     const isOtpCorrect = await user.verifyOtp(otp,messageId);
 
@@ -461,43 +407,17 @@ const resetPassword = asyncHandler(async (req,res)=>{
 
 });
 
-const addToCart = asyncHandler(async (req,res)=>{
-    const {productId} = req.params;
-    if(!productId?.trim())
-        throw new apiError(401,"product id not provided","product id not provided");
-    const product = await Product.findById(productId);
-    if(!product)
-        throw new apiError(402,"product not found","product not fouund");
-    const user = await User.findById(req.user._id);
-    user.cart.push(productId);
-    await user.save();
-    const updatedUser = await User.findById(user._id).select("-password -refreshToken");
-    if(!updatedUser)
-        throw new apiError(500,"cannot add prodcut into cart","cannot add product into cart");
-
-    res.status(200)
-    .json(
-        new apiResponse(
-            200,
-            updatedUser,
-            "prodcut added into cart"
-        )
-    )
-});
-
 export {
-    registerUser,
-    loginUser,
-    logoutUser,
+    registerShop,
+    loginShop,
+    logoutShop,
     updateUsername,
     updatePassword,
     updateName,
-    updateAvatar,
     getUserProfile,
     refreshAccessToken,
-    forgotPassword,
-    resetPassword,
-    emailVerify,
     sendVerificationEmail,
-    addToCart
-}
+    emailVerify,
+    forgotPassword,
+    resetPassword
+};

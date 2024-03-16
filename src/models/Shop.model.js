@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { jwt } from "jsonwebtoken";
+import jwt  from "jsonwebtoken";
 
 const shopModel = new mongoose.Schema({
     firstName:{
@@ -39,12 +39,6 @@ const shopModel = new mongoose.Schema({
         required:[true,"GSTIN is required"],
         unique:[true,"GSTIN is already registered"],
     },
-    products : [
-        {
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"Product",
-        }
-    ],
     location:{
         type:{
             type:String,
@@ -54,6 +48,11 @@ const shopModel = new mongoose.Schema({
         coordinates:{
             type:[Number], //[latitue,longitude]
             required:true,
+            validate:{
+                validator: function(value){
+                    return Array.isArray(value) && value.length==2;
+                }
+            }
         }
     },
     refreshToken:{
@@ -64,12 +63,24 @@ const shopModel = new mongoose.Schema({
         required:[true,"phone no. is required"],
         validate:{
             validator:function(number){
-                return /^(\+91\)?[6,7,8,9]\d{9}$/.test(number);
+                return /^(\+91)?[6-9]\d{9}$/.test(number);
             },
             message:"valid phone number required",
         },
         unique:[true,"number is already registered"]
     },
+    OTP: {
+        otp:{
+          type:Number,
+        },
+        messageId:{
+          type:String,
+        }
+    },
+    isEmailVerified:{
+        type:Boolean,
+        default:false,
+    }
     
 },{timestamps:true});
 
@@ -82,6 +93,12 @@ shopModel.pre("save",async function(next){
 
 shopModel.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password,this.password);
+}
+
+shopModel.methods.verifyOtp = async function (otp,messageId) {
+    if(this.OTP.otp == otp && this.OTP.messageId==messageId)
+      return true;
+    return false;
 }
 
 shopModel.methods.generateAcessToken = function(){

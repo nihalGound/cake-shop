@@ -13,23 +13,39 @@ const productModel = new mongoose.Schema({
         type:Number,
         required:true,
     },
-    images:[
-        {
-            type:String,//cloudinary url
-        }
-    ],
+    images:{
+            public_id:{
+                type:String,
+            },
+            secure_url:{
+                type:String
+            }
+    },
     rating:{
         type:Number,
-        defualt :0
+        default :0
     },
-    shopname:{
+    shop:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Shop",
+        required:true
     },
     isAvailable:{
-        types:Boolean,
-        default:false,
+        type:Boolean,
+        default:true,
     },
+    tags:{
+        type:[String],
+        required:true,
+    },
+    category: {
+        type:String,
+        enum:["birthday","party","marriage"]
+    },
+    subcategory: {
+        type:String,
+        enum:["chocolate","strawberry","orange","pineapple"]
+    }
 },{timestamps:true});
 
 export const Product = mongoose.model("Product",productModel);
