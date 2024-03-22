@@ -5,7 +5,9 @@ function App() {
   
 
   return (
-    <h1 className=' bg-black '>hello</h1>
+    <h1>
+      <img src="public/images/images6.jpg" alt="" />
+    </h1>
     
   )
 }
