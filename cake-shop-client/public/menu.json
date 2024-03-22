@@ -1,0 +1,131 @@
+[
+    {
+        "_id": "862c355b2c9875f05c56bea1",
+        "name": "Chocolate Lava Cake",
+        "recipe": "Rich chocolate cake with a gooey molten chocolate center, served with vanilla ice cream.",
+        "image": "/images/images1.jpg",
+        "category": "desserts",
+        "price": 9.5
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea2",
+        "name": "Classic Cheesecake",
+        "recipe": "Creamy cheesecake on a graham cracker crust, served with strawberry sauce.",
+        "image": "/images/images2.jpg",
+        "category": "Celebration Cakes",
+        "price": 11.0
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea3",
+        "name": "Carrot Cake",
+        "recipe": "Spiced carrot cake with walnuts, layered and topped with cream cheese frosting.",
+        "image": "/images/images3.jpg",
+        "category": "Cupcakes",
+        "price": 8.75
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea4",
+        "name": "Red Velvet Cake",
+        "recipe": "Classic red velvet cake with a light cocoa flavor, layered with cream cheese frosting.",
+        "image": "/images/images4.jpg",
+        "category": "Tea Time",
+        "price": 10.5
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea5",
+        "name": "Lemon Drizzle Cake",
+        "recipe": "Moist lemon-infused sponge cake with a sweet-tart lemon glaze.",
+        "image": "/images/images5.jpg",
+        "category": "desserts",
+        "price": 7.0
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea6",
+        "name": "Tiramisu Cake",
+        "recipe": "Layers of coffee-soaked sponge cake, mascarpone cheese, and dusted with cocoa powder.",
+        "image": "/images/images6.jpg",
+        "category": "desserts",
+        "price": 12.5
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea7",
+        "name": "Black Forest Cake",
+        "recipe": "Chocolate sponge cake with cherries, whipped cream, and shaved chocolate.",
+        "image": "/images/images7.jpg",
+        "category": "desserts",
+        "price": 13.25
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea8",
+        "name": "Pumpkin Spice Cake",
+        "recipe": "Moist pumpkin cake with spices, layered with cream cheese frosting and topped with pecans.",
+        "image": "/images/images8.jpg",
+        "category": "Celebration Cakes",
+        "price": 9.75
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea9",
+        "name": "Opera Cake",
+        "recipe": "Layers of almond sponge cake soaked in coffee syrup, layered with ganache and coffee buttercream.",
+        "image": "/images/images9.jpg",
+        "category": "Celebration Cakes",
+        "price": 14.5
+    },
+    {
+        "_id": "862c355b2c9875f05c56beaa",
+        "name": "Angel Food Cake",
+        "recipe": "Light and fluffy white sponge cake made with egg whites, served with fresh fruit and whipped cream.",
+        "image": "/images/images10.jpgg",
+        "category": "Celebration Cakes",
+        "price": 6.5
+    },
+    {
+        "_id": "862c355b2c9875f05c56beab",
+        "name": "Banana Bread Cake",
+        "recipe": "Moist banana bread transformed into a cake, topped with cream cheese frosting and walnuts.",
+        "image": "/images/images11.jpg",
+        "category": "Tea Time",
+        "price": 7.25
+    },
+    {
+        "_id": "862c355b2c9875f05c56beac",
+        "name": "Peach Upside Down Cake",
+        "recipe": "Buttery cake with caramelized peaches baked on top, served upside down.",
+        "image": "/images/images12.jpg",
+        "category": "Tea Time",
+        "price": 8.25
+    },
+    {
+        "_id": "862c355b2c9875f05c56bead",
+        "name": "Flourless Chocolate Cake",
+        "recipe": "Dense and fudgy chocolate cake made without flour, served with raspberry coulis.",
+        "image": "/images/images13.jpg",
+        "category": "Tea Time",
+        "price": 9.95
+    },
+    {
+        "_id": "862c355b2c9875f05c56beae",
+        "name": "Coconut Layer Cake",
+        "recipe": "Fluffy coconut cake with layers of coconut cream frosting and toasted coconut flakes.",
+        "image": "/images/images14.jpg",
+        "category": "Cupcakes",
+        "price": 10.75
+    },
+    {
+        "_id": "862c355b2c9875f05c56beaf",
+        "name": "Matcha Green Tea Cake",
+        "recipe": "Light and airy matcha sponge cake with white chocolate ganache, dusted with matcha powder.",
+        "image": "/images/images15.jpg",
+        "category": "Cupcakes",
+        "price": 11.5
+    },
+    {
+        "_id": "862c355b2c9875f05c56bea9",
+        "name": "Vanilla Berry Layer Cake",
+        "recipe": "Layers of soft vanilla sponge, filled with mixed berry compote and light whipped cream, topped with fresh berries and a dusting of powdered sugar.",
+        "image": "/images/images16.jpg",
+        "category": "Cupcakes",
+        "price": 18.5
+    }
+    
+]
