@@ -1,15 +1,19 @@
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Home from "./main_pages/Home";
 
-import './App.css'
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Home />,
+  },
+]);
 
 function App() {
-  
-
   return (
     <h1>
-      <img src="public/images/images6.jpg" alt="" />
+      <RouterProvider router={router} />
     </h1>
-    
-  )
+  );
 }
 
-export default App
+export default App;
