@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors : {
-        "name": "value"
+        "gray-green": "#3B606A",
       },
       // fontFamily : {
       //   "primary": ['Inter','sans-serif']
