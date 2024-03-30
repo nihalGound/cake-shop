@@ -2,7 +2,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./main_pages/Home";
 import Login from "./Authentication/Login";
 import SignUp from "./Authentication/SignUp";
-import Phone_verification from "./Authentication/Phone_verification";
+
 
 const router = createBrowserRouter([
   {
@@ -19,11 +19,7 @@ const router = createBrowserRouter([
     element: <SignUp />,
 
   },
-  {
-    path: "/verify-phone",
-    element: <Phone_verification />,
 
-  },
 
 ]);
 
