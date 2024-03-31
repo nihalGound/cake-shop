@@ -1,0 +1,42 @@
+.pageNotFoundContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    animation: fadeInUp 0.5s ease-out;
+  }
+  
+  .errorTitle {
+    font-size: 5rem;
+    animation: fadeInUp 0.5s ease-out 0.2s;
+    animation-fill-mode: backwards;
+  }
+  
+  .errorMessage {
+    font-size: 2rem;
+    animation: fadeInUp 0.5s ease-out 0.4s;
+    animation-fill-mode: backwards;
+  }
+  
+  .homeLink {
+    font-size: 1.5rem;
+    margin-top: 20px;
+    text-decoration: none;
+    color: royalblue;
+    animation: fadeInUp 0.5s ease-out 0.6s;
+    animation-fill-mode: backwards;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
