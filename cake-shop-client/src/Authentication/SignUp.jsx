@@ -29,15 +29,26 @@ const SignUp = () => {
         <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
                 Phone Number
               </label>
-              <div className="mt-2">
-                <PhoneInput defaultCountry="IN" value={number} onChange={setNumber} />
+              <div className="mt-2 relative border rounded-md border-gray-300 shadow-sm">
+                <PhoneInput
+                  defaultCountry="IN"
+                  value={number}
+                  onChange={setNumber}
+                  className="w-full pl-3 pr-10 py-2 rounded-md focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                />
               </div>
             </div>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
                 Full Name
               </label>
               <div className="mt-1">
@@ -53,48 +64,52 @@ const SignUp = () => {
               </div>
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
                 Password
               </label>
-              <div className="mt-1 flex items-center">
+              <div className="relative mt-1 flex items-center">
                 <input
                   id="password"
                   name="password"
                   type={seePassword ? "text" : "password"}
                   value={password}
                   required
-
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className="block w-full pl-3 pr-10 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
                 />
                 <button
                   type="button"
                   onClick={() => setSeePassword(!seePassword)}
-                  className="ml-2"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                 >
                   {seePassword ? <BsEyeSlashFill /> : <BsEyeFill />}
                 </button>
               </div>
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium leading-6 text-gray-900">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
                 Confirm Password
               </label>
-              <div className="mt-1 flex items-center">
+              <div className="mt-1 flex items-center relative">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
                   type={seeConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   required
-
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  className="block w-full pl-3 pr-10 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
                 />
                 <button
                   type="button"
                   onClick={() => setSeeConfirmPassword(!seeConfirmPassword)}
-                  className="ml-2"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
                 >
                   {seeConfirmPassword ? <BsEyeSlashFill /> : <BsEyeFill />}
                 </button>
@@ -114,7 +129,10 @@ const SignUp = () => {
 
           <p className="mt-10 text-center text-sm text-gray-500">
             Have an Account?{" "}
-            <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+            <Link
+              to="/login"
+              className="font-semibold text-gray-green hover:text-indigo-500"
+            >
               Sign in
             </Link>
           </p>
@@ -133,7 +151,10 @@ const SignUp = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-6">
             <div>
-              <label htmlFor="otp" className="block text-sm font-medium leading-6 text-gray-900">
+              <label
+                htmlFor="otp"
+                className="block text-sm font-medium leading-6 text-gray-900"
+              >
                 Enter OTP
               </label>
               <div className="mt-2">
@@ -159,18 +180,17 @@ const SignUp = () => {
             </div>
           </form>
 
-              <p className="mt-10 text-center text-sm text-gray-500">
-                <Link
-                  to="/signup"
-                  className="font-semibold leading-6 text-gray-green hover:text-blue-600 "
-                >
-                  Resend OTP
-                </Link>
-              </p>
-            </div>
-          </div>
+          <p className="mt-10 text-center text-sm text-gray-500">
+            <Link
+              to="/signup"
+              className="font-semibold leading-6 text-gray-green hover:text-blue-600 "
+            >
+              Resend OTP
+            </Link>
+          </p>
         </div>
-  
+      </div>
+    </div>
   );
 };
 
