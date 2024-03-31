@@ -37,7 +37,7 @@ const SignUp = () => {
           </div>
 
           <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-6" action="#"> 
               <div>
                 <label
                   htmlFor="email"
@@ -194,7 +194,7 @@ const SignUp = () => {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <form className="space-y-6" action="#" method="POST">
+              <form className="space-y-6" action="#" >
                 <div>
                   <label
                     htmlFor="email"
