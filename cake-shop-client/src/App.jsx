@@ -2,6 +2,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Home from "./main_pages/Home";
 import Login from "./Authentication/Login";
 import SignUp from "./Authentication/SignUp";
+import PageNotFound from "./404";
 
 
 const router = createBrowserRouter([
@@ -19,7 +20,11 @@ const router = createBrowserRouter([
     element: <SignUp />,
 
   },
+  {
+    path: "*",
+    element: <PageNotFound />,
 
+  },
 
 ]);
 
