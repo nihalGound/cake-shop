@@ -1,5 +1,5 @@
-import React from "react";
-import LOGO from "../visuals/imgs/LOGO.png";
+import React from "react"
+import LOGO from "../visuals/imgs/LOGO.png"
 import { Link } from "react-router-dom";
 
 const Login = () => {

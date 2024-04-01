@@ -1,22 +1,27 @@
-import { createContext } from "react";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { createContext, useContext } from "react";
+import { auth } from "../firebase";
 
+const authusercontext = createContext();
 
-const AuthUserContext = createContext();
+export function AuthUserContextProvider({ children }) {
+  function reCaptcha(number) {
+    const recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      "recaptcha-container",
+      {}
+    );
+    recaptchaVerifier.render();
+    return signInWithPhoneNumber(auth,number,recaptchaVerifier);
 
-
-const AuthUserContextProvider = () => {
-
-
-
-    return(
-        <AuthUserContextProvider>
-            
-        </AuthUserContextProvider>
-
-
-    )
-
+  }
+  return (
+    <authusercontext.Provider value={{ reCaptcha }}>
+      {children}
+    </authusercontext.Provider>
+  );
 }
 
-
-export default AuthUserContextProvider;
+export function useAuthContext() {
+  return useContext(authusercontext);
+}
